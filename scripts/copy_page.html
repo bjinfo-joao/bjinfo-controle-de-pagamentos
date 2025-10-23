@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Copiar link</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 24px; }
+      .card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+      .title { font-weight: 600; margin-bottom: 8px; }
+      button { padding: 10px 14px; border: 0; border-radius: 6px; cursor: pointer; }
+      .copy { background: #1a73e8; color: #fff; }
+      .ok { color: #1a73e8; font-weight: 600; display:none; margin-left:8px; }
+      a { word-break: break-all; }
+      .muted { color: #666; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <? if (uid && data.length === 1) { var r = data[0]; ?>
+      <div class="card">
+        <div class="title"><?= r.title ?> (<?= r.status ?>)</div>
+        <div><a id="link" href="<?= r.pastaUrl ?>" target="_blank"><?= r.pastaUrl ?></a></div>
+        <div style="margin-top:12px;">
+          <button class="copy" onclick="copy()">Copiar link da pasta</button>
+          <span id="ok" class="ok">Copiado!</span>
+        </div>
+        <div class="muted" style="margin-top:8px;">Dica: adicione esta página aos Favoritos para acesso rápido.</div>
+      </div>
+      <div style="margin-top:16px;">
+        <a href="?view=recent">Ver últimos registros</a>
+      </div>
+    <? } else { ?>
+      <h3>Últimos registros</h3>
+      <? if (data.length === 0) { ?>
+        <p>Sem registros.</p>
+      <? } else { data.forEach(function(r){ ?>
+        <div class="card">
+          <div class="title"><?= r.title ?> (<?= r.status ?>)</div>
+          <div><a href="<?= r.pastaUrl ?>" target="_blank"><?= r.pastaUrl ?></a></div>
+          <div style="margin-top:12px;">
+            <button class="copy" data-url="<?= r.pastaUrl ?>" onclick="copyFromAttr(this)">Copiar</button>
+            <a style="margin-left:8px;" href="?uid=<?= r.uid ?>">abrir individual</a>
+            <span class="ok">Copiado!</span>
+          </div>
+        </div>
+      <? }); } ?>
+    <? } ?>
+    <script>
+      async function copy(){
+        try {
+          const url = document.getElementById('link').href;
+          await navigator.clipboard.writeText(url);
+          const el = document.getElementById('ok');
+          el.style.display='inline'; setTimeout(()=>el.style.display='none',1500);
+        } catch (e) {
+          alert('Não foi possível copiar automaticamente. Copie manualmente: ' + document.getElementById('link').href);
+        }
+      }
+      async function copyFromAttr(el){
+        try {
+          const url = el.getAttribute('data-url');
+          await navigator.clipboard.writeText(url);
+          const ok = el.parentNode.querySelector('.ok');
+          if (ok){ ok.style.display='inline'; setTimeout(()=>ok.style.display='none',1500); }
+        } catch (e) {
+          alert('Não foi possível copiar automaticamente. Copie manualmente.');
+        }
+      }
+    </script>
+  </body>
+</html>
